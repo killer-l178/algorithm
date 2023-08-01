@@ -1,0 +1,215 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<iostream>
+#include<fstream>
+using namespace std;
+
+
+int main()
+{
+   const int rows = 11;
+   const int cols = 11;
+    // 创建原始二维动态数组
+    // 棋盘大小11*11
+    // 黑子为1，白子为2，无棋为0
+    int** dynamicArray = new int* [rows];
+    for (int i = 0; i < rows; ++i)
+    {
+        dynamicArray[i] = new int[cols];
+    }
+
+    //数组初始化
+    for (int i = 0; i < rows; ++i)
+    {
+        for (int j = 0; j < cols; ++j) 
+        {
+            dynamicArray[i][j] = 0;
+        }
+    }
+    // 对动态数组进行操作，例如赋值和输出
+    dynamicArray[0][0] = 1;
+    dynamicArray[1][1] = 2;
+    
+
+    // 输出动态数组的内容
+    std::cout << "原始数组：" << std::endl;
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            std::cout << dynamicArray[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    // 将二维数组转为稀疏数组
+    
+    // 遍历普通数组，记录有效数字 (done)
+    int sum = 0;
+    for (int i = 0; i < rows; ++i)
+    {
+        for (int j = 0; j < cols; ++j)
+        {
+            if (dynamicArray[i][j] != 0)
+                sum++;
+        }
+    }
+    cout << "sum = " << sum << endl;
+
+    cout << "稀疏数组:" << endl;
+    //创建稀疏数组
+
+    int** SparseArray = new int* [sum+1];
+    
+    for (int i = 0; i < sum + 1; ++i)
+    {
+        SparseArray[i] = new int[3];
+    }
+
+    int count = 0;
+    for (int i = 0; i < rows; ++i)
+    {
+        for (int j = 0; j < cols; ++j)
+        {
+            if (dynamicArray[i][j] != 0)
+            {
+                ++count;
+                SparseArray[count][0] = i;
+                SparseArray[count][1] = j;
+                SparseArray[count][2] = dynamicArray[i][j];
+            }
+        }
+    }
+
+    //将数据保存到稀疏数组
+    SparseArray[0][0] = rows;
+    SparseArray[0][1] = cols;
+    SparseArray[0][2] = sum;
+
+    //显示稀疏数组
+    for (int i = 0; i < sum + 1; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            cout << SparseArray[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+    cout << "\ncount =  " << count << "\n" << endl;
+
+
+    // 把稀疏数组转成普通数组
+    // 1.创建二维数组
+    // 2.把有效数据恢复到二维数组
+    int** Sparsetochess = new int* [SparseArray[0][0]];
+
+    for (int i = 0; i < rows; ++i)
+    {
+        Sparsetochess[i] = new int[SparseArray[0][1]];
+    }
+    //数据初始化
+    for (int i = 0; i < rows; ++i)
+    {
+        for (int j = 0; j < cols; ++j)
+        {
+            Sparsetochess[i][j] = 0;
+        }
+    }
+    // 把稀疏数组中的有效数据恢复到普通数组中
+    for (int i = 1; i <= count; i++)
+    {
+        Sparsetochess[SparseArray[i][0]][SparseArray[i][1]] = SparseArray[i][2];
+    }
+
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            cout << Sparsetochess[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+    cout << "\n利用文件保存稀疏数组\n";
+
+    // 记录稀疏数组到文件
+      // 打开文件流
+    std::ofstream outputFile("array_data.txt");
+
+    // 检查文件是否成功打开
+    if (!outputFile.is_open()) {
+        std::cerr << "无法打开文件." << std::endl;
+        return 1;
+    }
+
+    // 将数组内容写入文件
+    for (int i = 0; i < sum + 1; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            outputFile << SparseArray[i][j] << " ";
+        }
+        outputFile << endl;
+    }
+
+    // 关闭文件流
+    outputFile.close();
+
+    std::cout << "稀疏数组已保存到文件 array_data.txt\n" << std::endl;
+
+    //从文件中读取数组数据
+    // 打开文件流
+    std::ifstream inputFile("array_data.txt");
+
+    // 检查文件是否成功打开
+    if (!inputFile.is_open()) {
+        std::cerr << "无法打开文件." << std::endl;
+        return 1;
+    }
+
+
+    // 创建一个普通数组
+    // 从文件中读取有效数据
+    for (int i = 0; i < sum + 1; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            inputFile >> SparseArray[i][j];
+        }
+    }
+
+    // 关闭文件流
+    inputFile.close();
+    
+    for (int i = 0; i < rows; ++i)
+    {
+        for (int j = 0; j < cols; ++j)
+        {
+            Sparsetochess[i][j] = 0;
+        }
+    }
+
+    for (int i = 1; i <= count; i++)
+    {
+        Sparsetochess[SparseArray[i][0]][SparseArray[i][1]] = SparseArray[i][2];
+    }
+
+    // 显示普通数组
+    cout << "稀疏数组转普通数组:" << endl;
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            cout << Sparsetochess[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+
+    // 记得释放动态数组的内存
+    for (int i = 0; i < rows; ++i) 
+    {
+        delete[] dynamicArray[i];
+    }
+    delete[] dynamicArray;
+
+    return 0;
+}
