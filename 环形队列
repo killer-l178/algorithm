@@ -1,0 +1,173 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<iostream>
+using namespace std;
+/*
+环形队列类
+构造器
+实现功能：添加、删除队列数据，判断队列是否已满判断队列是否为空
+*/
+
+class CircleQueue
+{
+    ////    数组的最大容量
+    //private final int maxSize;
+    ////    front指向队列的第一个元素，初始值为0
+    //private int front;
+    ////    rear指向队列的最后一个元素的后一个位置，空出一个空间作为约定，初始值为0
+    //private int rear;
+    ////    存放数据，模拟队列
+    //private final int[] arr;
+
+private:
+    // 数组最大容量
+    int maxsize;
+    // 环形数列第一个元素
+    int front;
+    // 环形队列最后一个元素
+    int rear;
+    //数组
+    int* arr = new int[maxsize];
+
+public:
+    // 创建队列构造器
+    CircleQueue(int maxsize);
+
+    //查看队列所有数据
+    void showQueue();
+
+    // 判断队列是否已满
+    bool Full()
+    {
+        return (rear + 1) % maxsize == front;
+    }
+
+    // 判断队列是否为空
+    bool Empty()
+    {
+        return rear == front;
+    }
+
+    // 计算队列有效数据
+    int size()
+    {
+        return (rear + maxsize - front) % maxsize;
+    }
+
+
+    // 显示队列头数据
+    int HeadQueue();
+
+    // 添加数据到队列
+    void AddQueue(int n);
+
+    // 删除数据
+    // 队列先进先出，只能从队列的头取出
+    int GetQueue();
+
+};
+
+CircleQueue::CircleQueue(int maxsize)
+{
+    this->maxsize = maxsize;
+    front = 0;
+    rear = 0;
+    int* arr = new int[maxsize];
+}
+
+void CircleQueue::showQueue()
+{
+    if (Empty())
+    {
+        cout << " 队列为空 " << endl;
+        return;
+    }
+
+    for (int i = 0; i < front + size(); i++)
+    {
+        printf("arr[%d]=%d\n", i % maxsize, arr[i % maxsize]);
+    }
+}
+
+int CircleQueue::HeadQueue()
+{
+    //判断队列是否为空
+    if (Empty())
+    {
+        std::cerr << "Error! The queue is empty" << endl;
+    }
+    return arr[front];
+}
+
+void CircleQueue::AddQueue(int n)
+{
+    if (Full())
+    {
+        cerr << "Error! The queue is FUll" << endl;
+        return;
+    }
+    arr[rear] = n;
+    cout << n << "已成功添加到队列" << endl;
+    rear = (rear + 1) % maxsize;
+}
+
+int CircleQueue::GetQueue()
+{
+    if (Empty())
+    {
+        cerr << "Error! The queue is empty" << endl;
+    }
+
+    int value = arr[front];
+    front = (front + 1) % maxsize;
+    return value;
+}
+
+
+// 测试
+int main()
+{
+
+    //创建一个环形队列
+    CircleQueue circleQueue = CircleQueue(4);
+    bool loop = true;
+    char key;
+    while (loop)
+    {
+        int value = 0;
+        int res = 0;
+        printf("s(show),显示队列数据\n");
+        printf("e(exit),退出队列\n");
+        printf("a(add),添加数据到队列\n");
+        printf("g(get),获取队列数据\n");
+        printf("h(head),获取队列头数据\n");
+        //          接收输入的字符
+        cout << "请选择接下来的操作" << endl;
+        std::cin >> key;
+        switch (key) 
+        {
+        case 's':
+            circleQueue.showQueue();
+            break;
+        case 'a':
+            printf("输入一个数：");
+            std::cin >> value;
+            circleQueue.AddQueue(value);
+            break;
+        case 'g':
+            res = circleQueue.GetQueue();
+                printf("取出的数据是%d\n", res);
+                break;
+        case 'h':
+                res = circleQueue.HeadQueue();
+                printf("队列头的数据是%d\n", res);
+                break;
+        case 'e':
+            loop = false;
+            
+            break;
+        default:
+            break;
+        }
+    }
+    printf("-----程序退出-----");
+}
