@@ -1,7 +1,40 @@
+// 正确题解
+#include <iostream>
+#include <string>
+#include <cstring>
+#include <cstdio>
+
+using namespace std;
+string preorder, inorder;
+
+void slove(string pre, string in) {
+	if (pre.empty()) { return; }
+	char root = pre[0];
+	int k = in.find(root);
+	pre.erase(pre.begin());
+	string left_pre = pre.substr(0, k);
+	string right_pre = pre.substr(k);
+	string left_inor = in.substr(0, k);
+	string right_inor = in.substr(k + 1);
+	slove(left_pre, left_inor);
+	slove(right_pre, right_inor);
+	printf("%c", root);
+}
+
+int main() {
+	cin >> inorder >> preorder;
+	slove(preorder, inorder);
+	putchar('\n');
+	return 0;
+}
+
+
 #include <iostream>
 #include <vector>
 #include <algorithm>
 
+
+// 联想到leetcode根据前序中序构建二叉树
 using namespace std;
 
 struct TreeNode {
@@ -51,5 +84,3 @@ int main() {
     sol.postorder(root);
     return 0;
 }
-
-// 下面添加的内容只是为了测试
